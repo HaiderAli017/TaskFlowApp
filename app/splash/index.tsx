@@ -1,10 +1,12 @@
-import { router } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
 import React, { useEffect } from 'react';
-import { Image, Text, View } from 'react-native';
+import { View, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { StatusBar } from 'expo-status-bar';
+import { Feather } from '@expo/vector-icons';
+import { router } from 'expo-router';
 
 export default function SplashScreen() {
+
   useEffect(() => {
     const timer = setTimeout(() => {
       router.replace('/(tabs)');
@@ -13,18 +15,23 @@ export default function SplashScreen() {
     return () => clearTimeout(timer);
   }, []);
 
-  return (
-    <SafeAreaView className="flex-1 bg-white items-center justify-center">
-      <StatusBar style="dark" />
+    return (
+      <SafeAreaView className="flex-1 bg-[#6443FE] items-center justify-center relative">
+        <StatusBar style="light" backgroundColor="#6443FE" />
 
-      <View className="items-center">
-        <Image
-          source={require('../../assets/images/react-logo.png')} 
-          className="w-30 h-30 mb-4"
-          resizeMode="contain"
-        />
-        <Text className="text-2xl font-bold text-black-800">TaskFlow</Text>
-      </View>
-    </SafeAreaView>
-  );
-}
+        <View className="w-20 h-20 bg-white/20 rounded-2xl items-center justify-center mb-6">
+          <Feather name="check-square" size={40} color="white" />
+        </View>
+
+        <Text className="text-white text-3xl font-bold mb-2">TaskFlow</Text>
+        <Text className="text-white text-md font-semibold tracking-wide text-center">
+          Organize • Collaborate • Achieve
+        </Text>
+
+
+        <View className="absolute bottom-8">
+          <Text className="text-white/70 text-xs">Powered by FlowTech</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
