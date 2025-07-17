@@ -4,6 +4,7 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native';
 import 'react-native-reanimated';
+import '../styles/global.css';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
 
