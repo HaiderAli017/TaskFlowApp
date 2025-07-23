@@ -14,14 +14,16 @@ import {
     View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTheme } from '../../context/theme/ThemeContext';
 
 const PURPLE = '#5F3EFE';
-const BG = '#F7F7FF';
 
 export default function ForgetPasswordScreen() {
     const router = useRouter();
     const [email, setEmail] = useState('');
     const [error, setError] = useState('');
+    const { theme } = useTheme();
+    const isDarkMode = theme === 'dark';
 
     const handleReset = () => {
         if (!email) {
@@ -34,10 +36,10 @@ export default function ForgetPasswordScreen() {
     };
 
     return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: BG }}>
+        <SafeAreaView className={`flex-1 ${isDarkMode ? 'bg-gray-900' : 'bg-[#F7F7FF]'}`}>
             <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
                 <KeyboardAvoidingView
-                    style={{ flex: 1 }}
+                    className="flex-1"
                     behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                     keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 24}
                 >
@@ -52,80 +54,35 @@ export default function ForgetPasswordScreen() {
                         keyboardShouldPersistTaps="handled"
                     >
                         <TouchableOpacity
-                            style={{ position: 'absolute', left: 18, top: 18, zIndex: 2 }}
+                            className="absolute left-4 top-4 z-10 p-2"
                             onPress={() => router.replace('/login')}
                             activeOpacity={0.7}
                         >
-                            <Feather name="arrow-left" size={26} color={PURPLE} />
+                            <Feather name="arrow-left" size={26} color={isDarkMode ? '#5F3EFE' : PURPLE} />
                         </TouchableOpacity>
                         <View
-                            style={{
-                                width: '100%',
-                                maxWidth: 360,
-                                backgroundColor: '#fff',
-                                borderRadius: 22,
-                                padding: 32,
-                                alignItems: 'center',
-                                shadowColor: '#000',
-                                shadowOffset: { width: 0, height: 16 },
-                                shadowOpacity: 0.16,
-                                shadowRadius: 32,
-                                elevation: 16,
-                                minHeight: 340,
-                                justifyContent: 'center',
-                                position: 'relative',
-                            }}
+                            className="w-full max-w-sm bg-white dark:bg-gray-800 rounded-2xl p-8 items-center shadow-lg"
                         >
-
                             <Text
-                                style={{
-                                    fontSize: 26,
-                                    fontWeight: '700',
-                                    color: '#18181B',
-                                    marginBottom: 10,
-                                    fontFamily: Platform.OS === 'ios' ? 'Poppins' : 'sans-serif',
-                                    textAlign: 'center',
-                                }}
+                                className="text-2xl font-bold text-gray-900 dark:text-white mb-2"
                             >
                                 Reset Password
                             </Text>
                             <Text
-                                style={{
-                                    fontSize: 16,
-                                    color: '#71717A',
-                                    marginBottom: 32,
-                                    fontFamily: Platform.OS === 'ios' ? 'Poppins' : 'sans-serif',
-                                    textAlign: 'center',
-                                }}
+                                className="text-base text-gray-500 dark:text-gray-400 mb-8 text-center"
                             >
                                 Enter your email to receive reset link
                             </Text>
 
                             {/* Email Input */}
                             <View
-                                style={{
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    backgroundColor: '#fff',
-                                    borderRadius: 12,
-                                    borderWidth: 1,
-                                    borderColor: error && !email ? '#EF4444' : '#E5E7EB',
-                                    paddingHorizontal: 14,
-                                    marginBottom: 22,
-                                    height: 52,
-                                    width: '100%',
-                                }}
+                                className={`flex-row items-center bg-white dark:bg-gray-700 rounded-xl border mb-5 h-14 w-full px-4 ${error && !email ? 'border-red-500' : 'border-gray-200 dark:border-gray-600'}`}
                             >
-                                <Feather name="mail" size={20} color="#71717A" style={{ marginRight: 8 }} />
+                                <Feather name="mail" size={20} color={isDarkMode ? '#9CA3AF' : '#71717A'} className="mr-2" />
                                 <TextInput
-                                    style={{
-                                        flex: 1,
-                                        fontSize: 16,
-                                        color: '#18181B',
-                                        fontFamily: Platform.OS === 'ios' ? 'Poppins' : 'sans-serif',
-                                    }}
+                                    className="flex-1 text-base text-gray-900 dark:text-white"
                                     placeholder="Email address"
-                                    placeholderTextColor="#A1A1AA"
+                                    placeholderTextColor={isDarkMode ? '#9CA3AF' : '#A1A1AA'}
                                     keyboardType="email-address"
                                     autoCapitalize="none"
                                     value={email}
@@ -136,48 +93,26 @@ export default function ForgetPasswordScreen() {
 
                             {/* Error Alert */}
                             {!!error && (
-                                <View style={{ width: '100%', marginBottom: 12, alignItems: 'flex-start' }}>
-                                    <Text style={{ color: '#EF4444', fontSize: 15, fontWeight: '700' }}>{error}</Text>
+                                <View className="w-full mb-3 self-start">
+                                    <Text className="text-red-500 text-sm font-semibold">{error}</Text>
                                 </View>
                             )}
 
                             {/* Reset Button */}
                             <TouchableOpacity
-                                style={{
-                                    backgroundColor: PURPLE,
-                                    borderRadius: 16,
-                                    width: '100%',
-                                    alignItems: 'center',
-                                    paddingVertical: 16,
-                                    marginBottom: 18,
-                                    shadowColor: PURPLE,
-                                    shadowOffset: { width: 0, height: 8 },
-                                    shadowOpacity: 0.18,
-                                    shadowRadius: 16,
-                                    elevation: 8,
-                                }}
+                                className="bg-violet-600 rounded-2xl w-full items-center py-4 mb-4 shadow-md"
                                 activeOpacity={0.85}
                                 onPress={handleReset}
                             >
                                 <Text
-                                    style={{
-                                        color: '#fff',
-                                        fontWeight: '700',
-                                        fontSize: 17,
-                                        fontFamily: Platform.OS === 'ios' ? 'Poppins' : 'sans-serif',
-                                    }}
+                                    className="text-white font-bold text-lg"
                                 >
                                     Send Reset Link
                                 </Text>
                             </TouchableOpacity>
 
                             <Text
-                                style={{
-                                    color: '#71717A',
-                                    fontSize: 15,
-                                    fontFamily: Platform.OS === 'ios' ? 'Poppins' : 'sans-serif',
-                                    textAlign: 'center',
-                                }}
+                                className="text-gray-500 dark:text-gray-400 text-sm text-center"
                             >
                                 We'll send you a reset link via email
                             </Text>

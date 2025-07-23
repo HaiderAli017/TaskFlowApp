@@ -1,52 +1,30 @@
 import { Feather, FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { Platform, Text, TouchableOpacity, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTheme } from '../../context/theme/ThemeContext';
 
 const PURPLE = '#5F3EFE';
-const BG = '#F7F7FF';
 
 export default function Onboarding() {
   const router = useRouter();
+  const { theme } = useTheme();
+  const isDarkMode = theme === 'dark';
 
   return (
     <SafeAreaView
-      style={{
-        flex: 1,
-        backgroundColor: BG,
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingHorizontal: 24,
-      }}
+      className={`flex-1 items-center justify-center px-6 ${isDarkMode ? 'bg-gray-900' : 'bg-[#F7F7FF]'}`}
     >
       {/* Main Icon */}
       <View
-        style={{
-          width: 112,
-          height: 112,
-          borderRadius: 24,
-          backgroundColor: PURPLE,
-          alignItems: 'center',
-          justifyContent: 'center',
-          marginBottom: 32,
-          ...Platform.select({
-            ios: {
-              shadowColor: PURPLE,
-              shadowOffset: { width: 0, height: 8 },
-              shadowOpacity: 0.18,
-              shadowRadius: 16,
-            },
-            android: {
-              elevation: 8,
-            },
-          }),
-        }}
+        className="w-28 h-28 rounded-2xl items-center justify-center mb-8 shadow-lg"
+        style={{ backgroundColor: isDarkMode ? '#4C1D95' : PURPLE }}
       >
         <Feather name="check-square" size={56} color="#fff" />
       </View>
 
       {/* Features */}
-      <View style={{ width: '100%', marginBottom: 48 }}>
+      <View className="w-full mb-12">
         {[
           {
             icon: <Feather name="check-circle" size={24} color="#fff" />,
@@ -63,44 +41,16 @@ export default function Onboarding() {
         ].map((item, idx) => (
           <View
             key={idx}
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginBottom: idx < 2 ? 28 : 0,
-            }}
+            className="flex-row items-center mb-7"
           >
             <View
-              style={{
-                width: 44,
-                height: 44,
-                borderRadius: 22,
-                backgroundColor: PURPLE,
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginRight: 16,
-                ...Platform.select({
-                  ios: {
-                    shadowColor: PURPLE,
-                    shadowOffset: { width: 0, height: 4 },
-                    shadowOpacity: 0.12,
-                    shadowRadius: 8,
-                  },
-                  android: {
-                    elevation: 4,
-                  },
-                }),
-              }}
+              className="w-11 h-11 rounded-full items-center justify-center mr-4 shadow-md"
+              style={{ backgroundColor: isDarkMode ? '#4C1D95' : PURPLE }}
             >
               {item.icon}
             </View>
             <Text
-              style={{
-                flex: 1,
-                fontSize: 16,
-                fontWeight: '700',
-                color: '#18181B',
-                fontFamily: Platform.OS === 'ios' ? 'Poppins' : 'sans-serif',
-              }}
+              className="flex-1 text-base font-bold text-gray-900 dark:text-white"
             >
               {item.text}
             </Text>
@@ -111,33 +61,12 @@ export default function Onboarding() {
       {/* Get Started Button */}
       <TouchableOpacity
         onPress={() => router.replace('/login')}
-        style={{
-          backgroundColor: PURPLE,
-          paddingVertical: 18,
-          borderRadius: 16,
-          width: '100%',
-          alignItems: 'center',
-          ...Platform.select({
-            ios: {
-              shadowColor: PURPLE,
-              shadowOffset: { width: 0, height: 8 },
-              shadowOpacity: 0.18,
-              shadowRadius: 16,
-            },
-            android: {
-              elevation: 8,
-            },
-          }),
-        }}
+        className="w-full items-center py-4 rounded-2xl shadow-lg"
+        style={{ backgroundColor: isDarkMode ? '#4C1D95' : PURPLE }}
         activeOpacity={0.85}
       >
         <Text
-          style={{
-            color: '#fff',
-            fontWeight: '700',
-            fontSize: 16,
-            fontFamily: Platform.OS === 'ios' ? 'Poppins' : 'sans-serif',
-          }}
+          className="text-white font-bold text-base"
         >
           Get Started
         </Text>

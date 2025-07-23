@@ -3,16 +3,17 @@ import { router } from 'expo-router';
 import { ArrowLeft, Check, CheckSquare, Edit, MoreHorizontal, Plus, Square, Trash2 } from 'lucide-react-native';
 import React, { useMemo, useState } from 'react';
 import {
-    Alert,
-    Modal,
-    SafeAreaView,
-    ScrollView,
-    StatusBar,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  Modal,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
+import { useTheme } from '../../context/theme/ThemeContext';
 
 // --- MOCK DATA ---
 // Define interfaces for strong typing
@@ -66,6 +67,8 @@ const formatDate = (date: Date) => date.toLocaleDateString('en-US', { month: 'sh
 
 // --- MAIN COMPONENT ---
 const TaskDetailScreen: React.FC = () => {
+  const { theme } = useTheme();
+  const isDarkMode = theme === 'dark';
   // --- STATE MANAGEMENT ---
   const [task, setTask] = useState<Task>(initialTask);
   const [isEditing, setIsEditing] = useState<boolean>(false);
@@ -123,7 +126,7 @@ const TaskDetailScreen: React.FC = () => {
     );
     handleEditChange('checklist', updatedChecklist);
   };
-  
+
   const handleRemoveChecklistItem = (itemId: number) => {
     if (!editableTask) return;
     const updatedChecklist = editableTask.checklist.filter((item: ChecklistItem) => item.id !== itemId);
@@ -149,7 +152,7 @@ const TaskDetailScreen: React.FC = () => {
       handleEditChange(datePickerFor === 'start' ? 'startDate' : 'dueDate', selectedDate);
     }
   };
-  
+
   // Toggles a checklist item's 'completed' status in VIEW mode
   const handleToggleChecklistItem = (itemId: number) => {
     if (isEditing || task.isCompleted) return;
@@ -168,25 +171,25 @@ const TaskDetailScreen: React.FC = () => {
       Alert.alert("Cannot Complete", "Please complete all checklist items first.");
     }
   };
-  
+
   // Determine which task object to use for rendering
   const displayTask: Task | null = isEditing ? editableTask : task;
 
   return (
     <>
-      <StatusBar barStyle="dark-content" backgroundColor="#F8F9FA" />
-      <SafeAreaView className="flex-1 bg-gray-50">
+      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} backgroundColor={isDarkMode ? '#1F2937' : '#F8F9FA'} />
+      <SafeAreaView className="flex-1 bg-gray-50 dark:bg-gray-900">
         {/* --- Header --- */}
-        <View className="flex-row justify-between items-center p-4 bg-gray-50">
+        <View className="flex-row justify-between items-center p-4 bg-gray-50 dark:bg-gray-900">
           <TouchableOpacity onPress={() => isEditing ? setIsEditing(false) : router.replace('/taskList')}>
-            <ArrowLeft size={24} color="#333" />
+            <ArrowLeft size={24} color={isDarkMode ? '#FFF' : '#333'} />
           </TouchableOpacity>
-          <Text className="text-lg font-bold text-gray-800">Task Details</Text>
+          <Text className="text-lg font-bold text-gray-800 dark:text-white">Task Details</Text>
           <TouchableOpacity onPress={handleToggleEdit}>
             {isEditing ? (
-              <Text className="font-bold text-lg text-violet-600">Save</Text>
+              <Text className="font-bold text-lg text-violet-500">Save</Text>
             ) : (
-              <Edit size={22} color="#333" />
+              <Edit size={22} color={isDarkMode ? '#FFF' : '#333'} />
             )}
           </TouchableOpacity>
         </View>
@@ -194,16 +197,16 @@ const TaskDetailScreen: React.FC = () => {
         {/* We need to check if displayTask is not null before rendering */}
         {displayTask && (
           <ScrollView contentContainerStyle={{ padding: 16 }} showsVerticalScrollIndicator={false}>
-            <View className="bg-white p-6 rounded-2xl">
+            <View className="bg-white dark:bg-gray-800 p-6 rounded-2xl">
               {/* --- Non-Editable Section --- */}
               <View className="flex-row justify-between items-start">
-                <Text className="text-2xl font-bold text-gray-900 flex-1 pr-4">{displayTask.title}</Text>
-                <TouchableOpacity><MoreHorizontal size={24} color="#888" /></TouchableOpacity>
+                <Text className="text-2xl font-bold text-gray-900 dark:text-white flex-1 pr-4">{displayTask.title}</Text>
+                <TouchableOpacity><MoreHorizontal size={24} color={isDarkMode ? '#A0AEC0' : '#888'} /></TouchableOpacity>
               </View>
               {task.isCompleted && !isEditing && (
-                <View className="bg-green-100 border border-green-300 rounded-lg p-2 mt-4 flex-row items-center self-start">
-                  <Check size={16} color="rgb(34, 197, 94)" />
-                  <Text className="text-green-700 font-semibold ml-2">Task Completed</Text>
+                <View className="bg-green-100 dark:bg-green-900 border border-green-300 dark:border-green-700 rounded-lg p-2 mt-4 flex-row items-center self-start">
+                  <Check size={16} color={isDarkMode ? 'rgb(134, 239, 172)' : 'rgb(34, 197, 94)'} />
+                  <Text className="text-green-700 dark:text-green-300 font-semibold ml-2">Task Completed</Text>
                 </View>
               )}
               <View className="flex-row flex-wrap mt-4">
@@ -215,40 +218,41 @@ const TaskDetailScreen: React.FC = () => {
               </View>
 
               {/* --- Description --- */}
-              <View className="bg-gray-50 p-4 rounded-xl mt-6">
-                <Text className="text-base font-bold text-gray-800 mb-2">Description</Text>
+              <View className="bg-gray-50 dark:bg-gray-700 p-4 rounded-xl mt-6">
+                <Text className="text-base font-bold text-gray-800 dark:text-gray-200 mb-2">Description</Text>
                 {isEditing ? (
                   <TextInput
                     value={displayTask.description}
                     onChangeText={(text: string) => handleEditChange('description', text)}
                     multiline
-                    className="bg-white border border-gray-300 rounded-lg p-3 text-base leading-6 h-32"
+                    className="bg-white dark:bg-gray-600 border border-gray-300 dark:border-gray-500 rounded-lg p-3 text-base leading-6 h-32 text-black dark:text-white"
                     textAlignVertical="top"
+                    placeholderTextColor={isDarkMode ? '#A0AEC0' : '#9CA3AF'}
                   />
                 ) : (
-                  <Text className="text-gray-600 text-base leading-6">{displayTask.description}</Text>
+                  <Text className="text-gray-600 dark:text-gray-300 text-base leading-6">{displayTask.description}</Text>
                 )}
               </View>
-              
+
               {/* --- Dates --- */}
               <View className="flex-row justify-between mt-6">
-                <TouchableOpacity 
-                  className="bg-gray-50 p-4 rounded-xl w-[48%] items-center"
+                <TouchableOpacity
+                  className="bg-gray-50 dark:bg-gray-700 p-4 rounded-xl w-[48%] items-center"
                   disabled={!isEditing}
                   onPress={() => { setDatePickerFor('start'); setShowDatePicker(true); }}
                 >
-                  <Text className="text-sm text-gray-500 font-medium">Start Date</Text>
-                  <Text className="text-base text-gray-800 font-bold mt-1">
+                  <Text className="text-sm text-gray-500 dark:text-gray-400 font-medium">Start Date</Text>
+                  <Text className="text-base text-gray-800 dark:text-white font-bold mt-1">
                     {formatDate(displayTask.startDate)}
                   </Text>
                 </TouchableOpacity>
-                <TouchableOpacity 
-                  className="bg-gray-50 p-4 rounded-xl w-[48%] items-center"
+                <TouchableOpacity
+                  className="bg-gray-50 dark:bg-gray-700 p-4 rounded-xl w-[48%] items-center"
                   disabled={!isEditing}
                   onPress={() => { setDatePickerFor('due'); setShowDatePicker(true); }}
                 >
-                  <Text className="text-sm text-gray-500 font-medium">Due Date</Text>
-                  <Text className="text-base text-gray-800 font-bold mt-1">
+                  <Text className="text-sm text-gray-500 dark:text-gray-400 font-medium">Due Date</Text>
+                  <Text className="text-base text-gray-800 dark:text-white font-bold mt-1">
                     {formatDate(displayTask.dueDate)}
                   </Text>
                 </TouchableOpacity>
@@ -256,14 +260,14 @@ const TaskDetailScreen: React.FC = () => {
 
               {/* --- Checklist --- */}
               <View className="mt-8">
-                <Text className="text-lg font-bold text-gray-800 mb-3">Checklist ({completedCount}/{displayTask.checklist.length} completed)</Text>
+                <Text className="text-lg font-bold text-gray-800 dark:text-white mb-3">Checklist ({completedCount}/{displayTask.checklist.length} completed)</Text>
                 {isEditing ? (
                   // --- EDIT MODE CHECKLIST ---
                   <>
                     {displayTask.checklist.map((item: ChecklistItem) => (
                       <View key={item.id} className="flex-row items-center py-2">
-                        <TextInput 
-                          className="ml-4 text-base flex-1 border-b border-gray-300 pb-1"
+                        <TextInput
+                          className="ml-4 text-base flex-1 border-b border-gray-300 dark:border-gray-600 pb-1 text-black dark:text-white"
                           value={item.text}
                           onChangeText={(text: string) => handleChecklistTextChange(text, item.id)}
                         />
@@ -272,21 +276,21 @@ const TaskDetailScreen: React.FC = () => {
                         </TouchableOpacity>
                       </View>
                     ))}
-                    <TouchableOpacity onPress={handleAddNewChecklistItem} className="flex-row items-center py-3 mt-2 bg-sky-100 rounded-lg justify-center">
-                      <Plus size={20} color="#0369A1" />
-                      <Text className="text-sky-800 font-bold ml-2">Add Item</Text>
+                    <TouchableOpacity onPress={handleAddNewChecklistItem} className="flex-row items-center py-3 mt-2 bg-sky-100 dark:bg-sky-900 rounded-lg justify-center">
+                      <Plus size={20} color={isDarkMode ? '#7DD3FC' : '#0369A1'} />
+                      <Text className="text-sky-800 dark:text-sky-200 font-bold ml-2">Add Item</Text>
                     </TouchableOpacity>
                   </>
                 ) : (
                   // --- VIEW MODE CHECKLIST ---
                   <>
                     {displayTask.checklist.map((item: ChecklistItem) => (
-                      <TouchableOpacity key={item.id} className="flex-row items-center justify-between py-3 border-b border-gray-100" onPress={() => handleToggleChecklistItem(item.id)} disabled={task.isCompleted}>
+                      <TouchableOpacity key={item.id} className="flex-row items-center justify-between py-3 border-b border-gray-100 dark:border-gray-700" onPress={() => handleToggleChecklistItem(item.id)} disabled={task.isCompleted}>
                         <View className="flex-row items-center flex-1">
-                          {item.completed ? <CheckSquare size={24} color="#6443FE" /> : <Square size={24} color="#A0AEC0" />}
-                          <Text className={`ml-4 text-base flex-1 ${item.completed ? 'text-gray-400 line-through' : 'text-gray-700'}`}>{item.text}</Text>
+                          {item.completed ? <CheckSquare size={24} color="#6443FE" /> : <Square size={24} color={isDarkMode ? '#718096' : '#A0AEC0'} />}
+                          <Text className={`ml-4 text-base flex-1 ${item.completed ? 'text-gray-400 dark:text-gray-500 line-through' : 'text-gray-700 dark:text-gray-200'}`}>{item.text}</Text>
                         </View>
-                        <Text className={`text-sm ${item.completed ? 'text-gray-400' : 'text-gray-500'}`}>{item.date}</Text>
+                        <Text className={`text-sm ${item.completed ? 'text-gray-400 dark:text-gray-500' : 'text-gray-500 dark:text-gray-400'}`}>{item.date}</Text>
                       </TouchableOpacity>
                     ))}
                   </>
@@ -298,18 +302,18 @@ const TaskDetailScreen: React.FC = () => {
                 <>
                   <View className="mt-8">
                     <View className="flex-row justify-between items-center mb-2">
-                      <Text className="text-lg font-bold text-gray-800">Overall Progress</Text>
-                      <Text className="text-lg font-bold text-violet-600">{progress}%</Text>
+                      <Text className="text-lg font-bold text-gray-800 dark:text-white">Overall Progress</Text>
+                      <Text className="text-lg font-bold text-violet-600 dark:text-[#5F3EFE]">{progress}%</Text>
                     </View>
-                    <View className="bg-gray-200 h-2.5 rounded-full w-full"><View className="bg-violet-600 h-2.5 rounded-full" style={{ width: `${progress}%` }} /></View>
+                    <View className="bg-gray-200 dark:bg-gray-600 h-2.5 rounded-full w-full"><View className="h-2.5 rounded-full" style={{ width: `${progress}%`, backgroundColor: '#5F3EFE' }} /></View>
                   </View>
                   {!task.isCompleted && (
                     <TouchableOpacity
-                      className={`rounded-lg py-4 mt-8 ${progress === 100 ? 'bg-gray-800' : 'bg-gray-300'}`}
+                      className={`rounded-lg py-4 mt-8 ${progress === 100 ? 'bg-[#5F3EFE]' : 'bg-gray-300 dark:bg-gray-700'}`}
                       onPress={handleMarkAsComplete}
                       disabled={progress !== 100}
                     >
-                      <Text className="text-white text-center text-lg font-bold">Mark as Complete</Text>
+                      <Text className={`text-center text-lg font-bold ${progress === 100 ? 'text-white' : 'text-gray-500'}`}>Mark as Complete</Text>
                     </TouchableOpacity>
                   )}
                 </>
@@ -320,7 +324,7 @@ const TaskDetailScreen: React.FC = () => {
 
         {/* --- Modals --- */}
         {showDatePicker && displayTask && (
-          <DateTimePicker value={datePickerFor === 'start' ? displayTask.startDate : displayTask.dueDate} mode="date" display="default" onChange={onDateChange} />
+          <DateTimePicker value={datePickerFor === 'start' ? displayTask.startDate : displayTask.dueDate} mode="date" display="default" onChange={onDateChange} themeVariant={isDarkMode ? 'dark' : 'light'} />
         )}
         <Modal animationType="fade" transparent={true} visible={isPopupVisible} onRequestClose={() => setPopupVisible(false)}>
           <View className="flex-1 justify-center items-center bg-black/30">

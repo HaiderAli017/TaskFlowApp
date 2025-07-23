@@ -13,6 +13,7 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
+import { useTheme } from '../../context/theme/ThemeContext';
 
 // Helper function to format date for the header
 const formatDateForHeader = (date: Date) => {
@@ -33,6 +34,8 @@ const formatTimeForDisplay = (date: Date) => {
 // Main Component
 const CreateTaskScreen = () => {
   const router = useRouter();
+  const { theme } = useTheme();
+  const isDarkMode = theme === 'dark';
   // --- State Management ---
   const [taskTitle, setTaskTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -124,8 +127,8 @@ const CreateTaskScreen = () => {
 
   return (
     <>
-      <StatusBar barStyle="light-content" backgroundColor="#6443FE" translucent={false} />
-      <SafeAreaView className="flex-1 bg-[#6443FE]">
+      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} backgroundColor={isDarkMode ? '#1F2937' : '#6443FE'} translucent={false} />
+      <SafeAreaView className={`flex-1 ${isDarkMode ? 'bg-gray-800' : 'bg-[#6443FE]'}`}>
         <View className="flex-1">
           {/* --- Header --- */}
           <View className="px-5 pt-5 pb-12">
@@ -142,16 +145,16 @@ const CreateTaskScreen = () => {
           </View>
 
           {/* --- Form Card --- */}
-          <ScrollView 
-            className="flex-1 bg-white p-6 rounded-t-3xl"
+          <ScrollView
+            className="flex-1 bg-white dark:bg-gray-900 p-6 rounded-t-3xl"
             showsVerticalScrollIndicator={false}
           >
             {/* Task Title */}
-            <Text className="text-base font-medium text-gray-600 mb-2">Task Title</Text>
+            <Text className="text-base font-medium text-gray-600 dark:text-gray-400 mb-2">Task Title</Text>
             <TextInput
-              className="border border-gray-300 rounded-lg px-4 py-3 text-base"
+              className="border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-base text-black dark:text-white"
               placeholder="Enter task title"
-              placeholderTextColor="#9CA3AF"
+              placeholderTextColor={isDarkMode ? '#9CA3AF' : '#9CA3AF'}
               value={taskTitle}
               onChangeText={setTaskTitle}
             />
@@ -159,33 +162,33 @@ const CreateTaskScreen = () => {
             {/* Time Pickers */}
             <View className="flex-row justify-between mt-6">
               <View className="w-[48%]">
-                <Text className="text-base font-medium text-gray-600 mb-2">Start Time</Text>
+                <Text className="text-base font-medium text-gray-600 dark:text-gray-400 mb-2">Start Time</Text>
                 <TouchableOpacity
                   onPress={() => showTimePicker('start')}
-                  className="border border-gray-300 rounded-lg px-4 py-3 flex-row justify-between items-center"
+                  className="border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 flex-row justify-between items-center"
                 >
-                  <Text className="text-base">{formatTimeForDisplay(startTime)}</Text>
-                  <View className="w-2 h-2 border-b-2 border-r-2 border-gray-500 transform rotate-45" />
+                  <Text className="text-base text-black dark:text-white">{formatTimeForDisplay(startTime)}</Text>
+                  <View className="w-2 h-2 border-b-2 border-r-2 border-gray-500 dark:border-gray-400 transform rotate-45" />
                 </TouchableOpacity>
               </View>
               <View className="w-[48%]">
-                <Text className="text-base font-medium text-gray-600 mb-2">End Time</Text>
+                <Text className="text-base font-medium text-gray-600 dark:text-gray-400 mb-2">End Time</Text>
                 <TouchableOpacity
                   onPress={() => showTimePicker('end')}
-                  className="border border-gray-300 rounded-lg px-4 py-3 flex-row justify-between items-center"
+                  className="border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 flex-row justify-between items-center"
                 >
-                  <Text className="text-base">{formatTimeForDisplay(endTime)}</Text>
-                  <View className="w-2 h-2 border-b-2 border-r-2 border-gray-500 transform rotate-45" />
+                  <Text className="text-base text-black dark:text-white">{formatTimeForDisplay(endTime)}</Text>
+                  <View className="w-2 h-2 border-b-2 border-r-2 border-gray-500 dark:border-gray-400 transform rotate-45" />
                 </TouchableOpacity>
               </View>
             </View>
 
             {/* Description */}
-            <Text className="text-base font-medium text-gray-600 mt-6 mb-2">Description</Text>
+            <Text className="text-base font-medium text-gray-600 dark:text-gray-400 mt-6 mb-2">Description</Text>
             <TextInput
-              className="border border-gray-300 rounded-lg px-4 py-3 text-base h-24"
+              className="border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-base h-24 text-black dark:text-white"
               placeholder="Add task description..."
-              placeholderTextColor="#9CA3AF"
+              placeholderTextColor={isDarkMode ? '#9CA3AF' : '#9CA3AF'}
               multiline
               textAlignVertical="top"
               value={description}
@@ -193,27 +196,27 @@ const CreateTaskScreen = () => {
             />
 
             {/* Category */}
-            <Text className="text-base font-medium text-gray-600 mt-6 mb-2">Category</Text>
+            <Text className="text-base font-medium text-gray-600 dark:text-gray-400 mt-6 mb-2">Category</Text>
             <View className="flex-row flex-wrap items-center">
               {categories.map((cat) => (
                 <TouchableOpacity
                   key={cat}
                   onPress={() => setSelectedCategory(cat)}
-                  className={`px-5 py-2 rounded-lg mr-3 mb-3 ${selectedCategory === cat ? 'bg-[#6443FE]' : 'bg-gray-100'}`}
+                  className={`px-5 py-2 rounded-lg mr-3 mb-3 ${selectedCategory === cat ? 'bg-[#6443FE]' : (isDarkMode ? 'bg-gray-700' : 'bg-gray-100')}`}
                 >
-                  <Text className={`${selectedCategory === cat ? 'text-white' : 'text-gray-800'} font-medium`}>
+                  <Text className={`${selectedCategory === cat ? 'text-white' : (isDarkMode ? 'text-gray-300' : 'text-gray-800')} font-medium`}>
                     {cat}
                   </Text>
                 </TouchableOpacity>
               ))}
               {isAddingCategory ? (
-                <View className="flex-row items-center border-2 border-dashed border-[#6443FE] rounded-lg mr-3 mb-3 bg-white">
+                <View className="flex-row items-center border-2 border-dashed border-[#6443FE] rounded-lg mr-3 mb-3 bg-transparent">
                   <TextInput
                     value={newCategory}
                     onChangeText={setNewCategory}
                     placeholder="New category"
                     placeholderTextColor="#6443FE"
-                    className="px-3 py-2 min-w-[80px] text-[#6443FE]"
+                    className="px-3 py-2 min-w-[80px] text-[#6443FE] dark:text-blue-400"
                     autoFocus
                   />
                   <TouchableOpacity
@@ -234,17 +237,17 @@ const CreateTaskScreen = () => {
                   onPress={handleAddNewCategory}
                   className="px-5 py-2 rounded-lg mr-3 mb-3 border-2 border-dashed border-[#6443FE] flex-row items-center"
                 >
-                  <Text className="text-[#6443FE] font-medium">+ Add New</Text>
+                  <Text className="text-[#6443FE] dark:text-[#5F3EFE] font-medium">+ Add New</Text>
                 </TouchableOpacity>
               )}
             </View>
 
-            <View className="h-24" /> 
+            <View className="h-24" />
           </ScrollView>
-          
+
           {/* --- Create Task Button --- */}
-          <View className="p-6 bg-white">
-            <TouchableOpacity 
+          <View className="p-6 bg-white dark:bg-gray-900">
+            <TouchableOpacity
               className="bg-[#6443FE] rounded-lg py-4"
               onPress={handleCreateTask}
             >
@@ -261,6 +264,7 @@ const CreateTaskScreen = () => {
             mode="time"
             display="default"
             onChange={onTimeChange}
+            themeVariant={isDarkMode ? 'dark' : 'light'}
           />
         )}
 

@@ -3,21 +3,21 @@ import React from 'react';
 
 import { HapticTab } from '@/components/HapticTab';
 import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import BlurTabBarBackground from '@/components/ui/TabBarBackground.ios';
+import { useTheme } from '@/context/theme/ThemeContext';
 import '../../styles/global.css';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  const { theme } = useTheme();
+  const isDarkMode = theme === 'dark';
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarActiveTintColor: isDarkMode ? '#FFFFFF' : '#000000',
         headerShown: false,
         tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
+        tabBarBackground: () => <BlurTabBarBackground />,
         tabBarStyle: {
           display: 'none',
         },

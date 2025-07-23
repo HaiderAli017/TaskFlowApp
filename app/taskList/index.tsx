@@ -3,6 +3,7 @@ import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTheme } from '../../context/theme/ThemeContext';
 
 const TASKS = [
   {
@@ -53,17 +54,20 @@ const TASKS = [
 
 export default function TaskListScreen() {
   const router = useRouter();
+  const { theme } = useTheme();
+  const isDarkMode = theme === 'dark';
+
   return (
-    <SafeAreaView className="flex-1 bg-[#F7F7FF]">
+    <SafeAreaView className={`flex-1 ${isDarkMode ? 'bg-gray-900' : 'bg-[#F7F7FF]'}`}>
       {/* Header */}
       <View className="flex-row items-center justify-between px-5 pt-6 pb-3">
-        <Text className="text-lg font-extrabold text-[#18181B]" style={{ fontFamily: 'System' }}>Your Tasks</Text>
+        <Text className="text-lg font-extrabold text-[#18181B] dark:text-white" style={{ fontFamily: 'System' }}>Your Tasks</Text>
         <View className="flex-row items-center gap-2">
           <TouchableOpacity>
-            <Feather name="search" size={20} color="#71717A" />
+            <Feather name="search" size={20} color={isDarkMode ? '#A1A1AA' : '#71717A'} />
           </TouchableOpacity>
           <TouchableOpacity>
-            <Feather name="filter" size={20} color="#71717A" />
+            <Feather name="filter" size={20} color={isDarkMode ? '#A1A1AA' : '#71717A'} />
           </TouchableOpacity>
         </View>
       </View>
@@ -72,22 +76,22 @@ export default function TaskListScreen() {
         {TASKS.map((task, idx) => (
           <TouchableOpacity key={idx} onPress={() => router.push('/taskDetail')}>
             <View
-              className="bg-white rounded-2xl p-4 mb-4"
+              className="bg-white dark:bg-gray-800 rounded-2xl p-4 mb-4"
             >
               {/* Top Row: Priority and Status */}
               <View className="flex-row justify-between items-center mb-2">
-                <View style={{ backgroundColor: task.priorityBg }} className="px-3 py-1 rounded-full">
-                  <Text className="text-xs font-bold" style={{ color: task.priorityText, fontFamily: 'System' }}>{task.priority}</Text>
+                <View style={{ backgroundColor: isDarkMode && task.priority === 'Low Priority' ? '#4B5563' : task.priorityBg }} className="px-3 py-1 rounded-full">
+                  <Text className="text-xs font-bold" style={{ color: isDarkMode && task.priority === 'Low Priority' ? '#D1D5DB' : task.priorityText, fontFamily: 'System' }}>{task.priority}</Text>
                 </View>
-                <Text className="text-xs font-semibold" style={{ color: task.statusColor, fontFamily: 'System' }}>{task.status}</Text>
+                <Text className="text-xs font-semibold" style={{ color: isDarkMode ? '#9CA3AF' : task.statusColor, fontFamily: 'System' }}>{task.status}</Text>
               </View>
               {/* Title */}
               <View className="flex-row items-center mb-1">
                 <View className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: task.dotColor }} />
-                <Text className="text-base font-extrabold text-[#18181B]" style={{ fontFamily: 'System' }}>{task.title}</Text>
+                <Text className="text-base font-extrabold text-[#18181B] dark:text-white" style={{ fontFamily: 'System' }}>{task.title}</Text>
               </View>
               {/* Time and Team */}
-              <Text className="text-xs text-[#71717A] mb-2" style={{ fontFamily: 'System', fontWeight: '500' }}>{task.time} • {task.team}</Text>
+              <Text className="text-xs text-[#71717A] dark:text-gray-400 mb-2" style={{ fontFamily: 'System', fontWeight: '500' }}>{task.time} • {task.team}</Text>
               {/* Avatars */}
               <View className="flex-row justify-end mt-1">
                 {task.avatars.map((avatar, i) => (

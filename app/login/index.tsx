@@ -1,17 +1,19 @@
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Alert, Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTheme } from '../../context/theme/ThemeContext';
 
 const PURPLE = '#5F3EFE';
-const BG = '#F7F7FF';
 
 export default function LoginScreen() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const { theme } = useTheme();
+  const isDarkMode = theme === 'dark';
 
   const handleLogin = () => {
     if (!email || !password) {
@@ -26,85 +28,37 @@ export default function LoginScreen() {
   const getInputBorderColor = (field: 'email' | 'password') => {
     if (error && !email && field === 'email') return '#EF4444';
     if (error && !password && field === 'password') return '#EF4444';
-    return '#E5E7EB';
+    return isDarkMode ? '#4B5563' : '#E5E7EB';
   };
 
   return (
     <SafeAreaView
-      style={{
-        flex: 1,
-        backgroundColor: BG,
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingHorizontal: 16,
-      }}
+      className={`flex-1 items-center justify-center px-4 ${isDarkMode ? 'bg-gray-900' : 'bg-[#F7F7FF]'}`}
     >
       <View
-        style={{
-          width: '100%',
-          maxWidth: 340,
-          backgroundColor: '#fff',
-          borderRadius: 20,
-          padding: 28,
-          alignItems: 'center',
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 8 },
-          shadowOpacity: 0.08,
-          shadowRadius: 24,
-          elevation: 8,
-          minHeight: 420,
-          justifyContent: 'center',
-        }}
+        className="w-full max-w-sm bg-white dark:bg-gray-800 rounded-2xl p-7 items-center shadow-lg"
       >
         <Text
-          style={{
-            fontSize: 24,
-            fontWeight: '700',
-            color: '#18181B',
-            marginBottom: 8,
-            fontFamily: Platform.OS === 'ios' ? 'Poppins' : 'sans-serif',
-            textAlign: 'center',
-          }}
+          className="text-2xl font-bold text-gray-900 dark:text-white mb-2"
         >
           Welcome Back
         </Text>
         <Text
-          style={{
-            fontSize: 15,
-            color: '#71717A',
-            marginBottom: 28,
-            fontFamily: Platform.OS === 'ios' ? 'Poppins' : 'sans-serif',
-            textAlign: 'center',
-          }}
+          className="text-base text-gray-500 dark:text-gray-400 mb-7"
         >
           Sign in to continue
         </Text>
 
         {/* Email Input */}
         <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            backgroundColor: '#fff',
-            borderRadius: 12,
-            borderWidth: 1,
-            borderColor: getInputBorderColor('email'),
-            paddingHorizontal: 14,
-            marginBottom: 16,
-            height: 48,
-            width: '100%',
-          }}
+          className={`flex-row items-center bg-white dark:bg-gray-700 rounded-xl border mb-4 h-12 w-full px-4`}
+          style={{ borderColor: getInputBorderColor('email') }}
         >
-          <Feather name="mail" size={20} color="#71717A" style={{ marginRight: 8 }} />
+          <Feather name="mail" size={20} color={isDarkMode ? '#9CA3AF' : '#71717A'} className="mr-2" />
           <TextInput
-            style={{
-              flex: 1,
-              fontSize: 15,
-              color: '#18181B',
-              fontFamily: Platform.OS === 'ios' ? 'Poppins' : 'sans-serif',
-            }}
+            className="flex-1 text-base text-gray-900 dark:text-white"
             placeholder="Email address"
-            placeholderTextColor="#A1A1AA"
+            placeholderTextColor={isDarkMode ? '#9CA3AF' : '#A1A1AA'}
             keyboardType="email-address"
             autoCapitalize="none"
             value={email}
@@ -114,29 +68,14 @@ export default function LoginScreen() {
 
         {/* Password Input */}
         <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            backgroundColor: '#fff',
-            borderRadius: 12,
-            borderWidth: 1,
-            borderColor: getInputBorderColor('password'),
-            paddingHorizontal: 14,
-            marginBottom: 8,
-            height: 48,
-            width: '100%',
-          }}
+          className={`flex-row items-center bg-white dark:bg-gray-700 rounded-xl border mb-2 h-12 w-full px-4`}
+          style={{ borderColor: getInputBorderColor('password') }}
         >
-          <Feather name="lock" size={20} color="#71717A" style={{ marginRight: 8 }} />
+          <Feather name="lock" size={20} color={isDarkMode ? '#9CA3AF' : '#71717A'} className="mr-2" />
           <TextInput
-            style={{
-              flex: 1,
-              fontSize: 15,
-              color: '#18181B',
-              fontFamily: Platform.OS === 'ios' ? 'Poppins' : 'sans-serif',
-            }}
+            className="flex-1 text-base text-gray-900 dark:text-white"
             placeholder="Password"
-            placeholderTextColor="#A1A1AA"
+            placeholderTextColor={isDarkMode ? '#9CA3AF' : '#A1A1AA'}
             secureTextEntry={true}
             value={password}
             onChangeText={setPassword}
@@ -145,23 +84,18 @@ export default function LoginScreen() {
 
         {/* Error Alert */}
         {!!error && (
-          <View style={{ width: '100%', marginBottom: 10, alignItems: 'flex-start' }}>
-            <Text style={{ color: '#EF4444', fontSize: 14, fontWeight: '700' }}>{error}</Text>
+          <View className="w-full mb-2 self-start">
+            <Text className="text-red-500 text-sm font-semibold">{error}</Text>
           </View>
         )}
 
         {/* Forgot Password */}
         <TouchableOpacity
-          style={{ alignSelf: 'flex-end', marginBottom: 18 }}
+          className="self-end mb-4"
           onPress={() => router.push('/forgetPassword')}
         >
           <Text
-            style={{
-              color: PURPLE,
-              fontWeight: '700',
-              fontSize: 14,
-              fontFamily: Platform.OS === 'ios' ? 'Poppins' : 'sans-serif',
-            }}
+            className="text-violet-600 dark:text-violet-400 font-bold text-sm"
           >
             Forgot Password?
           </Text>
@@ -169,53 +103,27 @@ export default function LoginScreen() {
 
         {/* Login Button */}
         <TouchableOpacity
-          style={{
-            backgroundColor: PURPLE,
-            borderRadius: 14,
-            width: '100%',
-            alignItems: 'center',
-            paddingVertical: 14,
-            marginBottom: 18,
-            shadowColor: PURPLE,
-            shadowOffset: { width: 0, height: 8 },
-            shadowOpacity: 0.18,
-            shadowRadius: 16,
-            elevation: 8,
-          }}
+          className="bg-violet-600 rounded-xl w-full items-center py-3.5 mb-4 shadow-md"
           activeOpacity={0.85}
           onPress={handleLogin}
         >
           <Text
-            style={{
-              color: '#fff',
-              fontWeight: '700',
-              fontSize: 16,
-              fontFamily: Platform.OS === 'ios' ? 'Poppins' : 'sans-serif',
-            }}
+            className="text-white font-bold text-base"
           >
             Login
           </Text>
         </TouchableOpacity>
 
         {/* Sign Up Link */}
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <View className="flex-row items-center">
           <Text
-            style={{
-              color: '#71717A',
-              fontSize: 14,
-              fontFamily: Platform.OS === 'ios' ? 'Poppins' : 'sans-serif',
-            }}
+            className="text-gray-500 dark:text-gray-400 text-sm"
           >
             Don't have an account?{' '}
           </Text>
           <TouchableOpacity onPress={() => router.replace('/signup')}>
             <Text
-              style={{
-                color: PURPLE,
-                fontWeight: '700',
-                fontSize: 14,
-                fontFamily: Platform.OS === 'ios' ? 'Poppins' : 'sans-serif',
-              }}
+              className="text-violet-600 dark:text-violet-400 font-bold text-sm"
             >
               Sign Up
             </Text>

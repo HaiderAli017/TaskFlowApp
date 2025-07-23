@@ -3,6 +3,7 @@ import { useRouter } from 'expo-router';
 import React from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTheme } from '../../context/theme/ThemeContext';
 
 const NOTIFICATIONS = [
   {
@@ -55,49 +56,40 @@ const NOTIFICATIONS = [
 
 export default function NotificationsScreen() {
   const router = useRouter();
+  const { theme } = useTheme();
+  const isDarkMode = theme === 'dark';
+
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#F7F7FF' }}>
+    <SafeAreaView className={`flex-1 ${isDarkMode ? 'bg-gray-900' : 'bg-[#F7F7FF]'}`}>
       {/* Header */}
-      <View style={{ position: 'relative', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingHorizontal: 8, paddingTop: 10, paddingBottom: 18, backgroundColor: '#F7F7FF', zIndex: 10 }}>
-        <TouchableOpacity onPress={() => router.push('/dashboard')} style={{ position: 'absolute', left: 0, padding: 6 }}>
-          <Feather name="arrow-left" size={26} color="#18181B" />
+      <View className="relative flex-row items-center justify-center px-2 py-4 bg-transparent">
+        <TouchableOpacity onPress={() => router.push('/dashboard')} className="absolute left-2 p-2">
+          <Feather name="arrow-left" size={26} color={isDarkMode ? '#FFF' : '#18181B'} />
         </TouchableOpacity>
-        <Text style={{ fontSize: 22, fontWeight: 'bold', color: '#18181B', textAlign: 'center', flex: 1 }}>Notifications</Text>
-        <TouchableOpacity style={{ position: 'absolute', right: 0, padding: 6 }}>
-          <Text style={{ color: '#6366F1', fontWeight: '600', fontSize: 15 }}>Mark all read</Text>
+        <Text className="text-xl font-bold text-gray-900 dark:text-white text-center flex-1">Notifications</Text>
+        <TouchableOpacity className="absolute right-2 p-2">
+          <Text className="text-violet-600 dark:text-violet-400 font-semibold text-sm">Mark all read</Text>
         </TouchableOpacity>
       </View>
       <ScrollView contentContainerStyle={{ paddingHorizontal: 10, paddingBottom: 24 }} showsVerticalScrollIndicator={false}>
         {NOTIFICATIONS.map((item, idx) => (
           <View
             key={idx}
-            style={{
-              backgroundColor: '#fff',
-              borderRadius: 18,
-              padding: 18,
-              marginBottom: 16,
-              flexDirection: 'row',
-              alignItems: 'flex-start',
-              shadowColor: '#000',
-              shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.06,
-              shadowRadius: 12,
-              elevation: 2,
-            }}
+            className="bg-white dark:bg-gray-800 rounded-2xl p-4 mb-4 flex-row items-start shadow-md"
           >
             {/* Icon */}
-            <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: item.iconBg, justifyContent: 'center', alignItems: 'center', marginRight: 14, marginTop: 2 }}>
-              <Feather name={item.icon as any} size={22} color={item.iconColor} />
+            <View className="w-11 h-11 rounded-full justify-center items-center mr-3.5 mt-0.5" style={{ backgroundColor: isDarkMode ? '#374151' : item.iconBg }}>
+              <Feather name={item.icon as any} size={22} color={'#5F3EFE'} />
             </View>
             {/* Content */}
-            <View style={{ flex: 1 }}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                <Text style={{ fontWeight: 'bold', fontSize: 16, color: '#18181B' }}>{item.title}</Text>
-                <Text style={{ color: '#A1A1AA', fontSize: 13, marginLeft: 8 }}>{item.time}</Text>
+            <View className="flex-1">
+              <View className="flex-row items-center justify-between">
+                <Text className="font-bold text-base text-gray-900 dark:text-white">{item.title}</Text>
+                <Text className="text-gray-400 dark:text-gray-500 text-xs ml-2">{item.time}</Text>
               </View>
-              <Text style={{ color: '#71717A', fontSize: 14, marginTop: 2, marginBottom: 10 }}>{item.description}</Text>
-              <View style={{ alignSelf: 'flex-start', backgroundColor: item.tagColor, borderRadius: 8, paddingHorizontal: 10, paddingVertical: 3 }}>
-                <Text style={{ color: item.tagTextColor, fontWeight: '600', fontSize: 13 }}>{item.tag}</Text>
+              <Text className="text-gray-600 dark:text-gray-300 text-sm mt-0.5 mb-2.5">{item.description}</Text>
+              <View className="self-start rounded-lg px-2.5 py-1" style={{ backgroundColor: isDarkMode ? '#4B5563' : item.tagColor }}>
+                <Text className="font-semibold text-xs" style={{ color: isDarkMode ? '#D1D5DB' : item.tagTextColor }}>{item.tag}</Text>
               </View>
             </View>
           </View>

@@ -4,8 +4,11 @@ import { StatusBar } from 'expo-status-bar';
 import React, { useEffect } from 'react';
 import { Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTheme } from '../../context/theme/ThemeContext';
 
 export default function SplashScreen() {
+  const { theme } = useTheme();
+  const isDarkMode = theme === 'dark';
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -16,10 +19,10 @@ export default function SplashScreen() {
   }, []);
 
     return (
-      <SafeAreaView className="flex-1 bg-[#6443FE] items-center justify-center relative">
-        <StatusBar style="light" backgroundColor="#6443FE" />
+      <SafeAreaView className={`flex-1 items-center justify-center relative ${isDarkMode ? 'bg-gray-900' : 'bg-[#6443FE]'}`}>
+        <StatusBar style={isDarkMode ? "light" : "dark"} backgroundColor={isDarkMode ? "#1F2937" : "#6443FE"} />
 
-        <View className="w-20 h-20 bg-white/20 rounded-2xl items-center justify-center mb-6">
+        <View className={`w-20 h-20 rounded-2xl items-center justify-center mb-6 ${isDarkMode ? 'bg-gray-800' : 'bg-white/20'}`}>
           <Feather name="check-square" size={40} color="white" />
         </View>
 

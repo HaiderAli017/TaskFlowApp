@@ -1,4 +1,5 @@
 import BottomNavigation from '@/components/BottomNavigation';
+import { useTheme } from '@/context/theme/ThemeContext';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
@@ -17,9 +18,13 @@ import {
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 // Drawer Menu Item Component
-function DrawerMenuItem({ icon, label, active = false }: { icon: keyof typeof Feather.glyphMap; label: string; active?: boolean }) {
+function DrawerMenuItem({ icon, label, active = false, onPress }: { icon: keyof typeof Feather.glyphMap; label: string; active?: boolean; onPress?: () => void }) {
+  const { theme } = useTheme();
+  const isDarkMode = theme === 'dark';
+
   return (
     <TouchableOpacity
+      onPress={onPress}
       style={{
         flexDirection: 'row',
         alignItems: 'center',
@@ -30,8 +35,8 @@ function DrawerMenuItem({ icon, label, active = false }: { icon: keyof typeof Fe
         marginBottom: 6,
       }}
     >
-      <Feather name={icon} size={22} color={active ? '#fff' : '#18181B'} style={{ marginRight: 16, }} />
-      <Text style={{ color: active ? '#fff' : '#18181B', fontWeight: active ? 'bold' : 'normal', fontSize: 17 }}>
+      <Feather name={icon} size={22} color={active ? '#fff' : isDarkMode ? '#fff' : '#18181B'} style={{ marginRight: 16, }} />
+      <Text style={{ color: active ? '#fff' : isDarkMode ? '#fff' : '#18181B', fontWeight: active ? 'bold' : 'normal', fontSize: 17 }}>
         {label}
       </Text>
     </TouchableOpacity>
@@ -63,6 +68,8 @@ const CARD_WIDTH = windowWidth * 0.7;
 const maxWater = 8;
 
 export default function DashboardScreen() {
+  const { theme } = useTheme();
+  const isDarkMode = theme === 'dark';
   // Carousel state
   const [activeCard, setActiveCard] = useState(0);
   const flatListRef = useRef(null);
@@ -78,6 +85,9 @@ export default function DashboardScreen() {
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [drawerShouldRender, setDrawerShouldRender] = useState(false);
   const drawerAnim = useRef(new Animated.Value(-windowWidth * 0.8)).current; // Start hidden
+
+  // Active drawer item state
+  const [activeDrawerItem, setActiveDrawerItem] = useState('Home');
 
   // Animated values for dots
   const dotWidths = CARD_DATA.map((_, i) => useRef(new Animated.Value(i === 0 ? 32 : 10)).current);
@@ -121,16 +131,16 @@ export default function DashboardScreen() {
 
   return (
     <>
-      <StatusBar barStyle="dark-content" backgroundColor="#F7F7FF" translucent={false} />
-      <SafeAreaView className="flex-1 bg-[#F7F7FF]">
+      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} backgroundColor={isDarkMode ? '#18181B' : '#F7F7FF'} translucent={false} />
+      <SafeAreaView className="flex-1 bg-[#F7F7FF] dark:bg-[#18181B]">
         {/* Header */}
-        <View className={`flex-row items-center justify-between px-[18px] ${Platform.OS === 'ios' ? 'pt-8' : 'pt-6'} pb-[18px] bg-[#F7F7FF] z-10`}>
+        <View className={`flex-row items-center justify-between px-[18px] ${Platform.OS === 'ios' ? 'pt-8' : 'pt-6'} pb-[18px] bg-[#F7F7FF] dark:bg-[#18181B] z-10`}>
           <TouchableOpacity className="p-[6px]" onPress={() => setDrawerVisible(true)}>
-            <Feather name="menu" size={28} color="#18181B" />
+            <Feather name="menu" size={28} color={isDarkMode ? '#fff' : '#18181B'} />
           </TouchableOpacity>
           <View className="flex-row items-center gap-4">
             <TouchableOpacity className="mr-2 relative" onPress={() => router.push('/notifications')}>
-              <Feather name="bell" size={24} color="#18181B" />
+              <Feather name="bell" size={24} color={isDarkMode ? '#fff' : '#18181B'} />
               <View className="absolute -top-1 -right-1 bg-red-500 rounded-full min-w-[18px] h-[18px] justify-center items-center px-1">
                 <Text className="text-white font-bold text-xs">3</Text>
               </View>
@@ -167,33 +177,91 @@ export default function DashboardScreen() {
               <SafeAreaView
                 style={{
                   flex: 1,
-                  backgroundColor: '#fff',
+                  backgroundColor: isDarkMode ? '#1F2937' : '#fff',
                   paddingTop: insets.top - 8,
                   paddingHorizontal: 20,
                   elevation: 10,
                 }}
               >
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32, marginTop: -4 }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32, marginTop: 15 }}>
                   <View style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: '#5F3EFE', justifyContent: 'center', alignItems: 'center', marginRight: 12 }}>
                     <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 22 }}>D</Text>
                   </View>
                   <View style={{ flex: 1 }}>
-                    <Text style={{ fontWeight: 'bold', fontSize: 18 }}>Daisy Johnson</Text>
-                    <Text style={{ color: '#71717A', fontSize: 15 }}>Product Designer</Text>
+                    <Text style={{ fontWeight: 'bold', fontSize: 18, color: isDarkMode ? '#fff' : '#000' }}>Daisy Johnson</Text>
+                    <Text style={{ color: isDarkMode ? '#A1A1AA' : '#71717A', fontSize: 15 }}>Product Designer</Text>
                   </View>
                   <TouchableOpacity onPress={handleCloseDrawer}>
-                    <Feather name="x" size={24} color="#18181B" />
+                    <Feather name="x" size={24} color={isDarkMode ? '#fff' : '#18181B'} />
                   </TouchableOpacity>
                 </View>
                 {/* Menu Items */}
-                <DrawerMenuItem icon="home" label="Home" active />
-                <DrawerMenuItem icon="calendar" label="Calendar" />
-                <DrawerMenuItem icon="edit-3" label="Create New Task" />
-                <DrawerMenuItem icon="users" label="Team Members" />
-                <DrawerMenuItem icon="bar-chart-2" label="Analytics" />
-                <DrawerMenuItem icon="settings" label="Settings" />
-                <DrawerMenuItem icon="cpu" label="AI Voice Assistant" />
-                <DrawerMenuItem icon="log-out" label="Logout" />
+                <DrawerMenuItem
+                  onPress={() => {
+                    setActiveDrawerItem('Home');
+                    router.push('/dashboard');
+                  }}
+                  icon="home"
+                  label="Home"
+                  active={activeDrawerItem === 'Home'}
+                />
+                <DrawerMenuItem
+                  onPress={() => {
+                    setActiveDrawerItem('Calendar');
+                    router.push('/calendar');
+                  }}
+                  icon="calendar"
+                  label="Calendar"
+                  active={activeDrawerItem === 'Calendar'}
+                />
+                <DrawerMenuItem
+                  onPress={() => {
+                    setActiveDrawerItem('Create New Task');
+                    router.push('/createTask');
+                  }}
+                  icon="edit-3"
+                  label="Create New Task"
+                  active={activeDrawerItem === 'Create New Task'}
+                />
+                <DrawerMenuItem
+                  onPress={() => {
+                    setActiveDrawerItem('Team Members');
+                    router.push('/teamMember');
+                  }}
+                  icon="users"
+                  label="Team Members"
+                  active={activeDrawerItem === 'Team Members'}
+                />
+                <DrawerMenuItem
+                  onPress={() => { setActiveDrawerItem('Analytics')
+                    router.push('/analytics');
+                  }}
+                  icon="bar-chart-2"
+                  label="Analytics"
+                  active={activeDrawerItem === 'Analytics'}
+                />
+                <DrawerMenuItem
+                  onPress={() => { setActiveDrawerItem('Settings')
+                    router.push('/profileSetting');
+                  }}
+                  icon="settings"
+                  label="Settings"
+                  active={activeDrawerItem === 'Settings'}
+                />
+                <DrawerMenuItem
+                  onPress={() => { setActiveDrawerItem('AI Voice Assistant')
+                    router.push('/voiceAssistant');
+                  }}
+                  icon="cpu"
+                  label="AI Voice Assistant"
+                  active={activeDrawerItem === 'AI Voice Assistant'}
+                />
+                <DrawerMenuItem
+                  onPress={() => setActiveDrawerItem('Logout')}
+                  icon="log-out"
+                  label="Logout"
+                  active={activeDrawerItem === 'Logout'}
+                />
               </SafeAreaView>
             </Animated.View>
           </Pressable>
@@ -204,10 +272,10 @@ export default function DashboardScreen() {
           <View className="px-[18px] mt-2">
             <View className="flex-row items-center justify-between">
               <View>
-                <Text className="text-[26px] font-normal text-[#71717A]">
-                  Hello <Text className="font-bold text-[#18181B]">Daisy!</Text> <Text className="text-[22px]">👋</Text>
+                <Text className="text-[26px] font-normal text-[#71717A] dark:text-[#A1A1AA]">
+                  Hello <Text className="font-bold text-[#18181B] dark:text-white">Daisy!</Text> <Text className="text-[22px]">👋</Text>
                 </Text>
-                <Text className="text-[17px] text-[#71717A] mt-0.5">
+                <Text className="text-[17px] text-[#71717A] dark:text-[#A1A1AA] mt-0.5">
                   Have a productive day
                 </Text>
               </View>
@@ -283,7 +351,7 @@ export default function DashboardScreen() {
                     className="h-2 rounded-[4px] mx-[3px]"
                     style={{
                       width: dotWidths[i],
-                      backgroundColor: isActive ? PURPLE : '#E5E7EB',
+                      backgroundColor: isActive ? PURPLE : isDarkMode ? '#374151' : '#E5E7EB',
                     }}
                   />
                 );
@@ -291,70 +359,70 @@ export default function DashboardScreen() {
             </View>
           </View>
           {/* Today's Progress */}
-          <Text className="text-[22px] font-bold text-[#18181B] ml-[18px] mt-[18px] mb-2">
+          <Text className="text-[22px] font-bold text-[#18181B] dark:text-white ml-[18px] mt-[18px] mb-2">
             Today's Progress
           </Text>
           <View className="flex-row justify-between px-[18px] mb-2.5 gap-3">
-            <View className="flex-1 bg-white rounded-[18px] p-4 items-center mx-0.5 shadow-lg min-w-[120px]">
+            <View className="flex-1 bg-white dark:bg-[#1F2937] rounded-[18px] p-4 items-center mx-0.5 shadow-lg min-w-[120px]">
               <View className="flex-row items-center justify-between w-full">
                 <Feather name="check-square" size={22} color={PURPLE} />
                 <Text className="font-bold text-xl mt-[6px] mb-0.5 text-[#5F3EFE]">12/16</Text>
               </View>
-              <Text className="text-black text-[15px] font-bold mb-[6px] text-start w-full mt-2">Tasks Done</Text>
-              <View className="w-full h-[7px] bg-[#E5E7EB] rounded-[3px] mb-1">
+              <Text className="text-black dark:text-white text-[15px] font-bold mb-[6px] text-start w-full mt-2">Tasks Done</Text>
+              <View className="w-full h-[7px] bg-[#E5E7EB] dark:bg-gray-700 rounded-[3px] mb-1">
                 <View className="h-[7px] rounded-[3px] bg-[#5F3EFE]" style={{ width: '75%' }} />
               </View>
-              <Text className="text-[#71717A] text-[13px] mt-0.5">75% completed</Text>
+              <Text className="text-[#71717A] dark:text-gray-400 text-[13px] mt-0.5">75% completed</Text>
             </View>
             {/* Focus Time */}
-            <View className="flex-1 bg-white rounded-[18px] p-4 items-center mx-0.5 shadow-lg min-w-[120px]">
+            <View className="flex-1 bg-white dark:bg-[#1F2937] rounded-[18px] p-4 items-center mx-0.5 shadow-lg min-w-[120px]">
               <View className="flex-row items-center justify-between w-full">
                 <Feather name="clock" size={22} color={BLUE} />
                 <Text className="font-bold text-xl mt-[6px] mb-0.5 text-[#3576EC]">2.5h</Text>
               </View>
-              <Text className="text-black text-[15px] font-bold mb-[6px] text-start w-full mt-2">Focus Time</Text>
-              <View className="w-full h-[7px] bg-[#E5E7EB] rounded-[3px] mb-1">
+              <Text className="text-black dark:text-white text-[15px] font-bold mb-[6px] text-start w-full mt-2">Focus Time</Text>
+              <View className="w-full h-[7px] bg-[#E5E7EB] dark:bg-gray-700 rounded-[3px] mb-1">
                 <View className="h-[7px] rounded-[3px] bg-[#3576EC]" style={{ width: '62%' }} />
               </View>
-              <Text className="text-[#71717A] text-[13px] mt-0.5">5 sessions</Text>
+              <Text className="text-[#71717A] dark:text-gray-400 text-[13px] mt-0.5">5 sessions</Text>
             </View>
           </View>
           <View className="flex-row justify-between px-[18px] mb-2.5 gap-3">
             {/* Productivity */}
-            <View className="flex-1 bg-white rounded-[18px] p-4 items-center mx-0.5 shadow-lg min-w-[120px]">
+            <View className="flex-1 bg-white dark:bg-[#1F2937] rounded-[18px] p-4 items-center mx-0.5 shadow-lg min-w-[120px]">
               <View className="flex-row items-center justify-between w-full">
                 <Feather name="trending-up" size={22} color={PRODUCTIVITY_GREEN} />
                 <Text className="font-bold text-xl mt-[6px] mb-0.5 text-[#22C55E]">85%</Text>
               </View>
-              <Text className="text-black text-[15px] font-bold mb-[6px] text-start w-full mt-2">Productivity</Text>
-              <View className="w-full h-[7px] bg-[#E5E7EB] rounded-[3px] mb-1">
+              <Text className="text-black dark:text-white text-[15px] font-bold mb-[6px] text-start w-full mt-2">Productivity</Text>
+              <View className="w-full h-[7px] bg-[#E5E7EB] dark:bg-gray-700 rounded-[3px] mb-1">
                 <View className="h-[7px] rounded-[3px] bg-[#22C55E]" style={{ width: '85%' }} />
               </View>
-              <Text className="text-[#71717A] text-[13px] mt-0.5">Above average</Text>
+              <Text className="text-[#71717A] dark:text-gray-400 text-[13px] mt-0.5">Above average</Text>
             </View>
             {/* Energy */}
-            <View className="flex-1 bg-white rounded-[18px] p-4 items-center mx-0.5 shadow-lg min-w-[120px]">
+            <View className="flex-1 bg-white dark:bg-[#1F2937] rounded-[18px] p-4 items-center mx-0.5 shadow-lg min-w-[120px]">
               <View className="flex-row items-center justify-between w-full">
                 <Feather name="activity" size={22} color={ENERGY_ORANGE} />
                 <Text className="font-bold text-xl mt-[6px] mb-0.5 text-[#F59E42]">High</Text>
               </View>
-              <Text className="text-black text-[15px] font-bold mb-[6px] text-start w-full mt-2">Energy</Text>
-              <View className="w-full h-[7px] bg-[#E5E7EB] rounded-[3px] mb-1">
+              <Text className="text-black dark:text-white text-[15px] font-bold mb-[6px] text-start w-full mt-2">Energy</Text>
+              <View className="w-full h-[7px] bg-[#E5E7EB] dark:bg-gray-700 rounded-[3px] mb-1">
                 <View className="h-[7px] rounded-[3px] bg-[#F59E42]" style={{ width: '80%' }} />
               </View>
-              <Text className="text-[#71717A] text-[13px] mt-0.5">Feeling great!</Text>
+              <Text className="text-[#71717A] dark:text-gray-400 text-[13px] mt-0.5">Feeling great!</Text>
             </View>
           </View>
           {/* Water Tracker */}
-          <View className="bg-white rounded-[18px] p-[18px] mx-[18px] mt-4 shadow-lg flex-row items-center">
+          <View className="bg-white dark:bg-[#1F2937] rounded-[18px] p-[18px] mx-[18px] mt-4 shadow-lg flex-row items-center">
             {/* Icon with blue circle */}
             <View className="w-12 h-12 rounded-full bg-[#E0EDFF] justify-center items-center mr-3">
               <Feather name="droplet" size={24} color={BLUE} />
             </View>
             {/* Texts */}
             <View className="flex-1">
-              <Text className="font-bold text-[16px] text-[#18181B]">Water{'\n'}Tracker</Text>
-              <Text className="text-[#71717A] text-[13px] mt-1">{waterCount}/{maxWater} glasses{'\n'}today</Text>
+              <Text className="font-bold text-[16px] text-[#18181B] dark:text-white">Water{'\n'}Tracker</Text>
+              <Text className="text-[#71717A] dark:text-gray-400 text-[13px] mt-1">{waterCount}/{maxWater} glasses{'\n'}today</Text>
             </View>
             {/* Water glasses */}
             <View className="flex-row items-center mx-4">
@@ -363,7 +431,7 @@ export default function DashboardScreen() {
                   key={i}
                   className="w-2.5 h-6 rounded-full mx-0.5"
                   style={{
-                    backgroundColor: i < waterCount ? '#3576EC' : '#E5E7EB',
+                    backgroundColor: i < waterCount ? '#3576EC' : isDarkMode ? '#374151' : '#E5E7EB',
                   }}
                 />
               ))}
@@ -378,7 +446,7 @@ export default function DashboardScreen() {
             </TouchableOpacity>
           </View>
           {/* Mood Tracker */}
-          <View className="bg-white rounded-[18px] p-[18px] mx-[18px] mt-4 shadow-lg flex-row items-center">
+          <View className="bg-white dark:bg-[#1F2937] rounded-[18px] p-[18px] mx-[18px] mt-4 shadow-lg flex-row items-center">
             {/* Left emoji in yellow circle */}
             <View
               className="w-12 h-12 rounded-full justify-center items-center mr-3"
@@ -393,10 +461,10 @@ export default function DashboardScreen() {
 
             {/* Texts */}
             <View className="flex-1">
-              <Text className="font-bold text-[16px] text-[#18181B] leading-tight">
+              <Text className="font-bold text-[16px] text-[#18181B] dark:text-white leading-tight">
                 Mood{'\n'}Tracker
               </Text>
-              <Text className="text-[#71717A] text-[13px] mt-1">How are you feeling?</Text>
+              <Text className="text-[#71717A] dark:text-gray-400 text-[13px] mt-1">How are you feeling?</Text>
             </View>
 
             {/* Mood emoji pills */}
