@@ -1,6 +1,6 @@
 import { Feather } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useFocusEffect, useRouter } from 'expo-router';
+import { useCallback, useState } from 'react';
 import {
     Alert,
     Keyboard,
@@ -12,6 +12,7 @@ import {
     TouchableOpacity,
     TouchableWithoutFeedback,
     View,
+    StatusBar as RNStatusBar,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../context/theme/ThemeContext';
@@ -24,6 +25,14 @@ export default function ForgetPasswordScreen() {
     const [error, setError] = useState('');
     const { theme } = useTheme();
     const isDarkMode = theme === 'dark';
+
+    useFocusEffect(
+        useCallback(() => {
+            RNStatusBar.setBarStyle(isDarkMode ? 'light-content' : 'dark-content');
+            RNStatusBar.setBackgroundColor(isDarkMode ? '#1F2937' : '#F7F7FF');
+            return () => { };
+        }, [isDarkMode])
+    );
 
     const handleReset = () => {
         if (!email) {

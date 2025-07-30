@@ -1,7 +1,7 @@
 import { Feather } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
-import React from 'react';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { useFocusEffect, useRouter } from 'expo-router';
+import React, { useCallback } from 'react';
+import { ScrollView, StatusBar, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../context/theme/ThemeContext';
 
@@ -20,9 +20,7 @@ const NOTIFICATIONS = [
   {
     icon: 'droplet',
     title: 'Hydration Reminder',
-    description: 
-      
-      `Time to drink some water! You’re 2 glasses behind your goal.`,
+    description: 'Time to drink some water! You’re 2 glasses behind your goal.',
     time: '15m ago',
     tag: 'Health',
     tagColor: '#DBEAFE',
@@ -59,11 +57,22 @@ export default function NotificationsScreen() {
   const { theme } = useTheme();
   const isDarkMode = theme === 'dark';
 
+  useFocusEffect(
+    useCallback(() => {
+      StatusBar.setBarStyle(isDarkMode ? 'light-content' : 'dark-content');
+    }, [isDarkMode])
+  );
+
+  const handleBackPress = () => {
+    // Properly go back with expo-router
+    router.back();
+  };
+
   return (
     <SafeAreaView className={`flex-1 ${isDarkMode ? 'bg-gray-900' : 'bg-[#F7F7FF]'}`}>
       {/* Header */}
       <View className="relative flex-row items-center justify-center px-2 py-4 bg-transparent">
-        <TouchableOpacity onPress={() => router.push('/dashboard')} className="absolute left-2 p-2">
+        <TouchableOpacity onPress={handleBackPress} className="absolute left-2 p-2" hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
           <Feather name="arrow-left" size={26} color={isDarkMode ? '#FFF' : '#18181B'} />
         </TouchableOpacity>
         <Text className="text-xl font-bold text-gray-900 dark:text-white text-center flex-1">Notifications</Text>
@@ -71,17 +80,17 @@ export default function NotificationsScreen() {
           <Text className="text-violet-600 dark:text-violet-400 font-semibold text-sm">Mark all read</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Notification List */}
       <ScrollView contentContainerStyle={{ paddingHorizontal: 10, paddingBottom: 24 }} showsVerticalScrollIndicator={false}>
         {NOTIFICATIONS.map((item, idx) => (
           <View
             key={idx}
             className="bg-white dark:bg-gray-800 rounded-2xl p-4 mb-4 flex-row items-start shadow-md"
           >
-            {/* Icon */}
             <View className="w-11 h-11 rounded-full justify-center items-center mr-3.5 mt-0.5" style={{ backgroundColor: isDarkMode ? '#374151' : item.iconBg }}>
               <Feather name={item.icon as any} size={22} color={'#5F3EFE'} />
             </View>
-            {/* Content */}
             <View className="flex-1">
               <View className="flex-row items-center justify-between">
                 <Text className="font-bold text-base text-gray-900 dark:text-white">{item.title}</Text>

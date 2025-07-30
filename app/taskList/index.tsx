@@ -1,9 +1,10 @@
 import BottomNavigation from '@/components/BottomNavigation';
 import { Feather } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { useFocusEffect, useRouter } from 'expo-router';
+import { ScrollView, StatusBar, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../context/theme/ThemeContext';
+import { useCallback } from 'react';
 
 const TASKS = [
   {
@@ -56,6 +57,12 @@ export default function TaskListScreen() {
   const router = useRouter();
   const { theme } = useTheme();
   const isDarkMode = theme === 'dark';
+
+  useFocusEffect(
+    useCallback(() => {
+      StatusBar.setBarStyle(isDarkMode ? 'light-content' : 'dark-content');
+    }, [isDarkMode])
+  );
 
   return (
     <SafeAreaView className={`flex-1 ${isDarkMode ? 'bg-gray-900' : 'bg-[#F7F7FF]'}`}>

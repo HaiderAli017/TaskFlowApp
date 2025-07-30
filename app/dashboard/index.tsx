@@ -1,8 +1,8 @@
 import BottomNavigation from '@/components/BottomNavigation';
 import { useTheme } from '@/context/theme/ThemeContext';
 import { Feather } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
-import React, { useEffect, useRef, useState } from 'react';
+import { useFocusEffect, useRouter } from 'expo-router';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Animated,
   Dimensions,
@@ -89,6 +89,12 @@ export default function DashboardScreen() {
   // Active drawer item state
   const [activeDrawerItem, setActiveDrawerItem] = useState('Home');
 
+  useFocusEffect(
+    useCallback(() => {
+      StatusBar.setBarStyle(isDarkMode ? 'light-content' : 'dark-content');
+    }, [isDarkMode])
+  );
+
   // Animated values for dots
   const dotWidths = CARD_DATA.map((_, i) => useRef(new Animated.Value(i === 0 ? 32 : 10)).current);
 
@@ -131,7 +137,7 @@ export default function DashboardScreen() {
 
   return (
     <>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} backgroundColor={isDarkMode ? '#18181B' : '#F7F7FF'} translucent={false} />
+      {/* <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} backgroundColor={isDarkMode ? '#18181B' : '#F7F7FF'} translucent={false} /> */}
       <SafeAreaView className="flex-1 bg-[#F7F7FF] dark:bg-[#18181B]">
         {/* Header */}
         <View className={`flex-row items-center justify-between px-[18px] ${Platform.OS === 'ios' ? 'pt-8' : 'pt-6'} pb-[18px] bg-[#F7F7FF] dark:bg-[#18181B] z-10`}>

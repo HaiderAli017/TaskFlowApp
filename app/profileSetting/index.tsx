@@ -2,18 +2,24 @@ import { useRouter } from 'expo-router';
 import { ArrowLeft, Bell, Lock, MoreHorizontal } from 'lucide-react-native';
 import React from 'react';
 import {
-    SafeAreaView,
     ScrollView,
-    StatusBar,
+    StatusBar as RNStatusBar,
     Switch,
     Text,
     TouchableOpacity,
     View,
 } from 'react-native';
 import { useTheme } from '../../context/theme/ThemeContext';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
-const SettingsRow: React.FC<{ children: React.ReactNode, isFirst?: boolean }> = ({ children, isFirst }) => (
-    <View className={`bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-md ${isFirst ? '' : 'mt-4'}`}>
+const SettingsRow: React.FC<{ children: React.ReactNode; isFirst?: boolean }> = ({
+    children,
+    isFirst,
+}) => (
+    <View
+        className={`bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-md ${isFirst ? '' : 'mt-4'
+            }`}
+    >
         {children}
     </View>
 );
@@ -22,26 +28,39 @@ const ProfileSettingsScreen: React.FC = () => {
     const { theme, toggleTheme } = useTheme();
     const isDarkMode = theme === 'dark';
     const router = useRouter();
-    return (
-        <SafeAreaView className="flex-1 bg-slate-50 dark:bg-gray-900">
-            <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+    const insets = useSafeAreaInsets();
 
-            <View className="flex-row items-center p-5 bg-slate-50 dark:bg-gray-900 shadow-md">
+    return (
+        <SafeAreaView
+            edges={['top', 'left', 'right']}
+            className="flex-1"
+            style={{
+                backgroundColor: isDarkMode ? '#111827' : '#F4F4F5',
+                paddingTop: Math.max(insets.top - 6, 0), 
+            }}
+        >
+            <RNStatusBar
+                barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+                backgroundColor={isDarkMode ? '#111827' : '#F4F4F5'}
+            />
+
+            {/* Header */}
+            <View className="flex-row items-center px-5 mb-4">
                 <TouchableOpacity onPress={() => router.back()}>
                     <ArrowLeft size={24} color={isDarkMode ? '#FFFFFF' : '#1F2937'} />
                 </TouchableOpacity>
                 <View className="flex-1">
-                     <Text className="text-xl font-bold text-gray-900 dark:text-white ml-3">Settings</Text>
+                    <Text className="text-xl font-bold text-gray-900 dark:text-white ml-3">Settings</Text>
                 </View>
                 <View className="w-6" />
             </View>
 
-            <ScrollView contentContainerStyle={{ padding: 20, paddingTop: 10 }}>
-
+            {/* Content */}
+            <ScrollView contentContainerStyle={{ padding: 20, paddingTop: 0 }}>
                 <SettingsRow isFirst>
                     <View className="flex-row items-center justify-between">
                         <View className="flex-row items-center space-x-3">
-                            <View className="w-10 h-10 bg-[#E6EBFF] rounded-full flex items-center justify-center">
+                            <View className="w-10 h-10 bg-[#E6EBFF] rounded-full items-center justify-center flex">
                                 <Bell className="w-5 h-5" color="#5F3EFE" />
                             </View>
                             <View>
@@ -54,10 +73,10 @@ const ProfileSettingsScreen: React.FC = () => {
                             </View>
                         </View>
                         <Switch
-                            trackColor={{ false: "#E5E7EB", true: "#5F3EFE" }}
-                            thumbColor={"#FFFFFF"}
-                            onValueChange={() => {}} 
-                            value={true} 
+                            trackColor={{ false: '#E5E7EB', true: '#5F3EFE' }}
+                            thumbColor="#FFFFFF"
+                            onValueChange={() => { }}
+                            value={true}
                         />
                     </View>
                 </SettingsRow>
@@ -77,9 +96,9 @@ const ProfileSettingsScreen: React.FC = () => {
                                 </Text>
                             </View>
                         </View>
-                         <Switch
-                            trackColor={{ false: "#E5E7EB", true: "#5F3EFE" }}
-                            thumbColor={"#FFFFFF"}
+                        <Switch
+                            trackColor={{ false: '#E5E7EB', true: '#5F3EFE' }}
+                            thumbColor="#FFFFFF"
                             onValueChange={toggleTheme}
                             value={isDarkMode}
                         />
@@ -166,9 +185,7 @@ const ProfileSettingsScreen: React.FC = () => {
                                 <Text className="font-semibold ml-2 text-gray-900 dark:text-white text-base">
                                     About TaskFlow
                                 </Text>
-                                <Text className="text-gray-500 dark:text-gray-400 ml-2 text-sm">
-                                    Version 2.1.0
-                                </Text>
+                                <Text className="text-gray-500 dark:text-gray-400 ml-2 text-sm">Version 2.1.0</Text>
                             </View>
                         </View>
                         <TouchableOpacity>
@@ -176,7 +193,6 @@ const ProfileSettingsScreen: React.FC = () => {
                         </TouchableOpacity>
                     </View>
                 </SettingsRow>
-
             </ScrollView>
         </SafeAreaView>
     );

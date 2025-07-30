@@ -1,7 +1,7 @@
 import { Feather } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Alert, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { StatusBar as RNStatusBar, Alert, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../context/theme/ThemeContext';
 
@@ -14,6 +14,12 @@ export default function LoginScreen() {
   const [error, setError] = useState('');
   const { theme } = useTheme();
   const isDarkMode = theme === 'dark';
+
+  useFocusEffect(() => {
+    RNStatusBar.setBarStyle(isDarkMode ? 'light-content' : 'dark-content');
+    RNStatusBar.setBackgroundColor(isDarkMode ? '#1F2937' : '#F7F7FF');
+    return () => {};
+  });
 
   const handleLogin = () => {
     if (!email || !password) {

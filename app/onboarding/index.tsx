@@ -1,6 +1,6 @@
 import { Feather, FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { useFocusEffect, useRouter } from 'expo-router';
+import { StatusBar as RNStatusBar, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../context/theme/ThemeContext';
 
@@ -10,6 +10,12 @@ export default function Onboarding() {
   const router = useRouter();
   const { theme } = useTheme();
   const isDarkMode = theme === 'dark';
+
+  useFocusEffect(() => {
+    RNStatusBar.setBarStyle(isDarkMode ? 'light-content' : 'dark-content');
+    RNStatusBar.setBackgroundColor(isDarkMode ? '#1F2937' : '#F7F7FF');
+    return () => {};
+  });
 
   return (
     <SafeAreaView
