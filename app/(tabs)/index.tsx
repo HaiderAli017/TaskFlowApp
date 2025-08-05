@@ -4,8 +4,7 @@ import { useEffect } from 'react';
 export default function HomeScreen() {
   const router = useRouter();
   useEffect(() => {
-    router.replace('/dashboard/index');
+    router.replace('/dashboard');
   }, []);
   return null;
 }
-

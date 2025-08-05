@@ -2,6 +2,7 @@ import BottomNavigation from '@/components/BottomNavigation';
 import { useTheme } from '@/context/theme/ThemeContext';
 import { Feather } from '@expo/vector-icons';
 import { useFocusEffect, useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Animated,
@@ -67,6 +68,9 @@ const windowWidth = Dimensions.get('window').width;
 const CARD_WIDTH = windowWidth * 0.7;
 const maxWater = 8;
 
+const WATER_COUNT_KEY = 'waterCount';
+const LAST_RESET_DATE_KEY = 'lastResetDate';
+
 export default function DashboardScreen() {
   const { theme } = useTheme();
   const isDarkMode = theme === 'dark';
@@ -75,7 +79,7 @@ export default function DashboardScreen() {
   const flatListRef = useRef(null);
 
   // Water tracker state
-  const [waterCount, setWaterCount] = useState(6); // Example: 6/8
+  const [waterCount, setWaterCount] = useState(0); // Initialize with 0, will load from storage
 
   // Mood tracker state
   const [selectedMood, setSelectedMood] = useState(0);
@@ -89,10 +93,53 @@ export default function DashboardScreen() {
   // Active drawer item state
   const [activeDrawerItem, setActiveDrawerItem] = useState('Home');
 
+  // Function to get today's date in YYYY-MM-DD format
+  const getTodayDate = () => {
+    const today = new Date();
+    return today.toISOString().split('T')[0]; // YYYY-MM-DD
+  };
+
+  // Load water tracker data from AsyncStorage
+  const loadWaterTracker = useCallback(async () => {
+    try {
+      const storedWaterCount = await AsyncStorage.getItem(WATER_COUNT_KEY);
+      const storedLastResetDate = await AsyncStorage.getItem(LAST_RESET_DATE_KEY);
+      const todayDate = getTodayDate();
+
+      let currentWaterCount = storedWaterCount ? parseInt(storedWaterCount, 10) : 0;
+
+      if (storedLastResetDate !== todayDate) {
+        // It's a new day, reset water count
+        currentWaterCount = 0;
+        await AsyncStorage.setItem(LAST_RESET_DATE_KEY, todayDate);
+      }
+      setWaterCount(currentWaterCount);
+      await AsyncStorage.setItem(WATER_COUNT_KEY, currentWaterCount.toString()); // Ensure it's saved for today
+    } catch (error) {
+      console.error('Failed to load water tracker data:', error);
+    }
+  }, []);
+
+  // Save water tracker data to AsyncStorage
+  const saveWaterTracker = useCallback(async (count: number) => {
+    try {
+      await AsyncStorage.setItem(WATER_COUNT_KEY, count.toString());
+      setWaterCount(count);
+    } catch (error) {
+      console.error('Failed to save water tracker data:', error);
+    }
+  }, []);
+
   useFocusEffect(
     useCallback(() => {
       StatusBar.setBarStyle(isDarkMode ? 'light-content' : 'dark-content');
-    }, [isDarkMode])
+      if (Platform.OS === 'android') {
+        StatusBar.setBackgroundColor(isDarkMode ? '#18181B' : '#F7F7FF');
+      }
+      // Set activeDrawerItem to 'Home' when dashboard screen is focused
+      setActiveDrawerItem('Home');
+      loadWaterTracker(); // Load water tracker data when screen is focused
+    }, [isDarkMode, loadWaterTracker])
   );
 
   // Animated values for dots
@@ -137,7 +184,6 @@ export default function DashboardScreen() {
 
   return (
     <>
-      {/* <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} backgroundColor={isDarkMode ? '#18181B' : '#F7F7FF'} translucent={false} /> */}
       <SafeAreaView className="flex-1 bg-[#F7F7FF] dark:bg-[#18181B]">
         {/* Header */}
         <View className={`flex-row items-center justify-between px-[18px] ${Platform.OS === 'ios' ? 'pt-8' : 'pt-6'} pb-[18px] bg-[#F7F7FF] dark:bg-[#18181B] z-10`}>
@@ -173,18 +219,18 @@ export default function DashboardScreen() {
               style={{
                 position: 'absolute',
                 left: 0,
-                top: 0,
+                top: 0, // This should be adjusted to account for status bar height
                 bottom: 0,
                 width: '80%',
                 height: '100%',
                 transform: [{ translateX: drawerAnim }],
+                paddingTop: insets.top, // Add padding to push content below status bar
               }}
             >
               <SafeAreaView
                 style={{
                   flex: 1,
                   backgroundColor: isDarkMode ? '#1F2937' : '#fff',
-                  paddingTop: insets.top - 8,
                   paddingHorizontal: 20,
                   elevation: 10,
                 }}
@@ -261,6 +307,15 @@ export default function DashboardScreen() {
                   icon="cpu"
                   label="AI Voice Assistant"
                   active={activeDrawerItem === 'AI Voice Assistant'}
+                />
+                <DrawerMenuItem
+                  onPress={() => {
+                    setActiveDrawerItem('Tree');
+                    router.push('/tree');
+                  }}
+                  icon="git-merge"
+                  label="Tree"
+                  active={activeDrawerItem === 'Tree'}
                 />
                 <DrawerMenuItem
                   onPress={() => setActiveDrawerItem('Logout')}
@@ -445,7 +500,7 @@ export default function DashboardScreen() {
             {/* Plus button */}
             <TouchableOpacity
               className="bg-[#3576EC] rounded-full w-8 h-8 justify-center items-center ml-2"
-              onPress={() => setWaterCount(waterCount < maxWater ? waterCount + 1 : maxWater)}
+              onPress={() => saveWaterTracker(waterCount < maxWater ? waterCount + 1 : maxWater)}
               disabled={waterCount >= maxWater}
             >
               <Feather name="plus" size={20} color="#fff" />

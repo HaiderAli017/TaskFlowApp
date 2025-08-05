@@ -64,15 +64,18 @@ export default function NotificationsScreen() {
   );
 
   const handleBackPress = () => {
-    // Properly go back with expo-router
-    router.back();
+    router.push('/dashboard');
   };
 
   return (
     <SafeAreaView className={`flex-1 ${isDarkMode ? 'bg-gray-900' : 'bg-[#F7F7FF]'}`}>
       {/* Header */}
       <View className="relative flex-row items-center justify-center px-2 py-4 bg-transparent">
-        <TouchableOpacity onPress={handleBackPress} className="absolute left-2 p-2" hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+        <TouchableOpacity
+          onPress={handleBackPress}
+          className="absolute left-2 p-2"
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
           <Feather name="arrow-left" size={26} color={isDarkMode ? '#FFF' : '#18181B'} />
         </TouchableOpacity>
         <Text className="text-xl font-bold text-gray-900 dark:text-white text-center flex-1">Notifications</Text>

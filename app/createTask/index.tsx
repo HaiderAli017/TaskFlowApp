@@ -18,15 +18,8 @@ import { useTheme } from '../../context/theme/ThemeContext';
 
 // Format helpers
 const formatDateForHeader = (date: Date) => {
-  const options = { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' };
+  const options = { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' };
   return date.toLocaleDateString('en-GB', options as Intl.DateTimeFormatOptions);
-};
-const formatTimeForDisplay = (date: Date) => {
-  return date.toLocaleTimeString('en-US', {
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true,
-  });
 };
 
 const CreateTaskScreen = () => {
@@ -34,13 +27,11 @@ const CreateTaskScreen = () => {
   const { theme } = useTheme();
   const isDarkMode = theme === 'dark';
 
-  // StatusBar fix
   useFocusEffect(
     useCallback(() => {
       StatusBar.setBarStyle(isDarkMode ? 'light-content' : 'dark-content');
-      if (Platform.OS === 'android') {
-        StatusBar.setBackgroundColor(isDarkMode ? '#1F2937' : '#6443FE');
-      }
+      StatusBar.setBackgroundColor(isDarkMode ? '#1F2937' : '#6443FE');
+      StatusBar.setTranslucent(false);
     }, [isDarkMode])
   );
 
@@ -49,33 +40,50 @@ const CreateTaskScreen = () => {
   const [description, setDescription] = useState('');
   const [categories, setCategories] = useState(['Meeting', 'Urgent', 'Work', 'Design']);
   const [selectedCategory, setSelectedCategory] = useState('Urgent');
-  const [startTime, setStartTime] = useState(new Date());
-  const [endTime, setEndTime] = useState(new Date(new Date().getTime() + 60 * 60 * 1000));
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
+  const [checklistItems, setChecklistItems] = useState<string[]>([]);
+  const [newChecklistItem, setNewChecklistItem] = useState('');
+  const [priority, setPriority] = useState('Medium'); // Default priority
+  const [assignedPeople, setAssignedPeople] = useState('');
   const [showPicker, setShowPicker] = useState(false);
   const [pickerFor, setPickerFor] = useState<'start' | 'end'>('start');
   const [isPopupVisible, setPopupVisible] = useState(false);
   const [isAddingCategory, setIsAddingCategory] = useState(false);
   const [newCategory, setNewCategory] = useState('');
 
-  const onTimeChange = (event: any, selectedDate?: Date) => {
+  const onDateChange = (event: any, selectedDate?: Date) => {
     setShowPicker(false);
     if (event.type === 'set' && selectedDate) {
       if (pickerFor === 'start') {
-        setStartTime(selectedDate);
-        setEndTime(new Date(selectedDate.getTime() + 60 * 60 * 1000));
+        setStartDate(selectedDate);
+        if (selectedDate > endDate) {
+          setEndDate(selectedDate);
+        }
       } else {
-        if (selectedDate < startTime) {
-          Alert.alert("Invalid Time", "End time cannot be earlier than start time.");
+        if (selectedDate < startDate) {
+          Alert.alert("Invalid Date", "End date cannot be earlier than start date.");
         } else {
-          setEndTime(selectedDate);
+          setEndDate(selectedDate);
         }
       }
     }
   };
 
-  const showTimePicker = (pickerType: 'start' | 'end') => {
+  const showDatePicker = (pickerType: 'start' | 'end') => {
     setPickerFor(pickerType);
     setShowPicker(true);
+  };
+
+  const addChecklistItem = () => {
+    if (newChecklistItem.trim()) {
+      setChecklistItems([...checklistItems, newChecklistItem.trim()]);
+      setNewChecklistItem('');
+    }
+  };
+
+  const removeChecklistItem = (index: number) => {
+    setChecklistItems(checklistItems.filter((_, i) => i !== index));
   };
 
   const resetForm = () => {
@@ -83,8 +91,12 @@ const CreateTaskScreen = () => {
     setDescription('');
     setSelectedCategory('Urgent');
     const now = new Date();
-    setStartTime(now);
-    setEndTime(new Date(now.getTime() + 60 * 60 * 1000));
+    setStartDate(now);
+    setEndDate(now);
+    setChecklistItems([]);
+    setNewChecklistItem('');
+    setPriority('Medium');
+    setAssignedPeople('');
   };
 
   const handleCreateTask = () => {
@@ -149,25 +161,25 @@ const CreateTaskScreen = () => {
             onChangeText={setTaskTitle}
           />
 
-          {/* Time Pickers */}
+          {/* Start Date & End Date */}
           <View className="flex-row justify-between mt-6">
             <View className="w-[48%]">
-              <Text className="text-base font-medium text-gray-600 dark:text-gray-400 mb-2">Start Time</Text>
+              <Text className="text-base font-medium text-gray-600 dark:text-gray-400 mb-2">Start Date</Text>
               <TouchableOpacity
-                onPress={() => showTimePicker('start')}
+                onPress={() => showDatePicker('start')}
                 className="border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 flex-row justify-between items-center"
               >
-                <Text className="text-base text-black dark:text-white">{formatTimeForDisplay(startTime)}</Text>
+                <Text className="text-base text-black dark:text-white">{formatDateForHeader(startDate)}</Text>
                 <View className="w-2 h-2 border-b-2 border-r-2 border-gray-500 dark:border-gray-400 transform rotate-45" />
               </TouchableOpacity>
             </View>
             <View className="w-[48%]">
-              <Text className="text-base font-medium text-gray-600 dark:text-gray-400 mb-2">End Time</Text>
+              <Text className="text-base font-medium text-gray-600 dark:text-gray-400 mb-2">End Date</Text>
               <TouchableOpacity
-                onPress={() => showTimePicker('end')}
+                onPress={() => showDatePicker('end')}
                 className="border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 flex-row justify-between items-center"
               >
-                <Text className="text-base text-black dark:text-white">{formatTimeForDisplay(endTime)}</Text>
+                <Text className="text-base text-black dark:text-white">{formatDateForHeader(endDate)}</Text>
                 <View className="w-2 h-2 border-b-2 border-r-2 border-gray-500 dark:border-gray-400 transform rotate-45" />
               </TouchableOpacity>
             </View>
@@ -183,6 +195,56 @@ const CreateTaskScreen = () => {
             textAlignVertical="top"
             value={description}
             onChangeText={setDescription}
+          />
+
+          {/* Checklist */}
+          <Text className="text-base font-medium text-gray-600 dark:text-gray-400 mt-6 mb-2">Checklist</Text>
+          {checklistItems.map((item, index) => (
+            <View key={index} className="flex-row items-center justify-between border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 mb-2">
+              <Text className="text-base text-black dark:text-white flex-1">{item}</Text>
+              <TouchableOpacity onPress={() => removeChecklistItem(index)} className="ml-2">
+                <X size={20} color="red" />
+              </TouchableOpacity>
+            </View>
+          ))}
+          <View className="flex-row items-center mt-2">
+            <TextInput
+              className="border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-base text-black dark:text-white flex-1 mr-2"
+              placeholder="Add checklist item"
+              placeholderTextColor="#9CA3AF"
+              value={newChecklistItem}
+              onChangeText={setNewChecklistItem}
+              onSubmitEditing={addChecklistItem}
+            />
+            <TouchableOpacity onPress={addChecklistItem} className="bg-[#6443FE] rounded-lg px-4 py-3">
+              <Text className="text-white text-base font-bold">Add</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Priority */}
+          <Text className="text-base font-medium text-gray-600 dark:text-gray-400 mt-6 mb-2">Priority</Text>
+          <View className="flex-row flex-wrap items-center">
+            {['Low', 'Medium', 'High', 'Critical'].map((prio) => (
+              <TouchableOpacity
+                key={prio}
+                onPress={() => setPriority(prio)}
+                className={`px-5 py-2 rounded-lg mr-3 mb-3 ${priority === prio ? 'bg-[#6443FE]' : isDarkMode ? 'bg-gray-700' : 'bg-gray-100'}`}
+              >
+                <Text className={`${priority === prio ? 'text-white' : isDarkMode ? 'text-gray-300' : 'text-gray-800'} font-medium`}>
+                  {prio}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          {/* Assigned People */}
+          <Text className="text-base font-medium text-gray-600 dark:text-gray-400 mt-6 mb-2">Assigned People</Text>
+          <TextInput
+            className="border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-base text-black dark:text-white"
+            placeholder="Enter names (comma-separated)"
+            placeholderTextColor="#9CA3AF"
+            value={assignedPeople}
+            onChangeText={setAssignedPeople}
           />
 
           {/* Category */}
@@ -234,13 +296,13 @@ const CreateTaskScreen = () => {
           </TouchableOpacity>
         </View>
 
-        {/* Time Picker */}
+        {/* Date Picker */}
         {showPicker && (
           <DateTimePicker
-            value={pickerFor === 'start' ? startTime : endTime}
-            mode="time"
+            value={pickerFor === 'start' ? startDate : endDate}
+            mode="date"
             display="default"
-            onChange={onTimeChange}
+            onChange={onDateChange}
             themeVariant={isDarkMode ? 'dark' : 'light'}
           />
         )}
